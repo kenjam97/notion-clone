@@ -7,14 +7,19 @@ import { PlusCircle } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const DocumentsPage = () => {
+  const router = useRouter();
   const { user } = useUser();
-
   const createDocumentMutation = useMutation(api.documents.create);
 
   const createDocument = () => {
-    const promise = createDocumentMutation({ title: "Untitled" });
+    const promise = createDocumentMutation({ title: "Untitled" }).then(
+      (documentId) => {
+        router.push(`/documents/${documentId}`);
+      }
+    );
 
     toast.promise(promise, {
       loading: "Creating document...",
@@ -24,7 +29,7 @@ const DocumentsPage = () => {
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center space-y-4">
+    <div className="flex flex-col items-center justify-center h-full space-y-4">
       <Image
         src="/empty.png"
         height="300"
@@ -43,7 +48,7 @@ const DocumentsPage = () => {
         Welcome to {user?.fullName}&apos;s Jotion
       </h2>
       <Button onClick={createDocument}>
-        <PlusCircle className="h-4 w-4 mr-2" />
+        <PlusCircle className="w-4 h-4 mr-2" />
         Create a document
       </Button>
     </div>

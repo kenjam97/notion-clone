@@ -32,8 +32,6 @@ export const TrashBox = () => {
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     documentId: Id<"documents">
   ) => {
-    event.stopPropagation();
-
     const promise = restoreDocument({ id: documentId });
 
     toast.promise(promise, {

@@ -22,7 +22,7 @@ import {
   Plus,
   Trash,
 } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface ItemProps {
@@ -51,7 +51,7 @@ export const Item = ({
   onExpand,
 }: ItemProps) => {
   const router = useRouter();
-  const pathname = usePathname();
+  const params = useParams();
   const { user } = useUser();
 
   const createDocument = useMutation(api.documents.create);
@@ -117,7 +117,7 @@ export const Item = ({
       error: "Failed to delete document.",
     });
 
-    if (pathname === `/documents/${id}`) {
+    if (params.documentId === id) {
       router.push("/documents");
     }
   };
@@ -146,7 +146,7 @@ export const Item = ({
       {documentIcon ? (
         <div className="shrink-0 mr-2 text-[18px]">{documentIcon}</div>
       ) : (
-        <Icon className="shrink-0 h-[18px] mr-2 text-muted-foreground" />
+        <Icon className="shrink-0 h-[18px] w-[18px] mr-2 text-muted-foreground" />
       )}
       <span className="truncate">{label}</span>
       {isSearch && (

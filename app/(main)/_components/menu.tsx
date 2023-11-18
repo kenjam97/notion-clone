@@ -14,6 +14,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import { Archive, MoreHorizontal, Trash, Undo } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface MenuProps {
@@ -22,6 +23,8 @@ interface MenuProps {
 }
 
 export const Menu = ({ documentId, isArchived }: MenuProps) => {
+  const params = useParams();
+  const router = useRouter();
   const { user } = useUser();
 
   const archive = useMutation(api.documents.archive);
@@ -56,6 +59,10 @@ export const Menu = ({ documentId, isArchived }: MenuProps) => {
       success: "Document removed",
       error: "Failed to remove document",
     });
+
+    if (params.documentId === documentId) {
+      router.push("/documents");
+    }
   };
 
   return (
