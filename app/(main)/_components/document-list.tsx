@@ -62,7 +62,7 @@ export const DocumentList = ({
           level === 0 && "hidden"
         )}
       >
-        No pages inside
+        No nested docs
       </p>
       {documents.map((document) => (
         <div key={document._id}>

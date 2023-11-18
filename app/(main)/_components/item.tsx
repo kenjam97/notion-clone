@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import {
+  Archive,
   ChevronDown,
   ChevronRight,
   LucideIcon,
@@ -21,7 +22,7 @@ import {
   Plus,
   Trash,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface ItemProps {
@@ -50,9 +51,12 @@ export const Item = ({
   onExpand,
 }: ItemProps) => {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useUser();
+
   const createDocument = useMutation(api.documents.create);
   const archiveDocument = useMutation(api.documents.archive);
+  const deleteDocument = useMutation(api.documents.remove);
 
   const handleExpand = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -76,13 +80,13 @@ export const Item = ({
         onExpand?.();
       }
 
-      // router.push(`/documents/${documentId}`);
+      router.push(`/documents/${documentId}`);
     });
 
     toast.promise(promise, {
-      loading: "Creating a new note...",
-      success: "A new note has been created!",
-      error: "Failed to create a new note.",
+      loading: "Creating a new document...",
+      success: "A new document has been created!",
+      error: "Failed to create a new document.",
     });
   };
 
@@ -94,10 +98,28 @@ export const Item = ({
     const promise = archiveDocument({ id });
 
     toast.promise(promise, {
-      loading: "Archiving note...",
-      success: "Note has been archived!",
-      error: "Failed to archive note.",
+      loading: "Archiving document...",
+      success: "Document has been archived!",
+      error: "Failed to archive document.",
     });
+  };
+
+  const onRemove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!id) return;
+
+    event.stopPropagation();
+
+    const promise = deleteDocument({ id });
+
+    toast.promise(promise, {
+      loading: "Deleting document...",
+      success: "Document has been deleted!",
+      error: "Failed to delete document.",
+    });
+
+    if (pathname === `/documents/${id}`) {
+      router.push("/documents");
+    }
   };
 
   const ChevronIcon = expanded ? ChevronDown : ChevronRight;
@@ -115,10 +137,10 @@ export const Item = ({
       {!!id && (
         <div
           role="button"
-          className="h-full rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600 mr-1"
+          className="h-full mr-1 rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
           onClick={handleExpand}
         >
-          <ChevronIcon className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+          <ChevronIcon className="w-4 h-4 shrink-0 text-muted-foreground/50" />
         </div>
       )}
       {documentIcon ? (
@@ -136,14 +158,14 @@ export const Item = ({
         </kbd>
       )}
       {!!id && (
-        <div className="ml-auto flex items-center gap-x-2">
+        <div className="flex items-center ml-auto gap-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger onClick={(e) => e.stopPropagation()} asChild>
               <div
                 role="button"
-                className="opacity-0 group-hover:opacity-100 h-full ml-auto rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
+                className="h-full ml-auto rounded-sm opacity-0 group-hover:opacity-100 hover:bg-neutral-300 dark:hover:bg-neutral-600"
               >
-                <MoreHorizontal className="h-4 w-4 to-muted-foreground" />
+                <MoreHorizontal className="w-4 h-4 to-muted-foreground" />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -153,21 +175,25 @@ export const Item = ({
               forceMount
             >
               <DropdownMenuItem onClick={onArchive}>
-                <Trash className="h-4 w-4 mr-2" />
+                <Archive className="w-4 h-4 mr-2" />
+                Archive
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onRemove}>
+                <Trash className="w-4 h-4 mr-2" />
                 Delete
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <div className="text-xs text-muted-foreground p-2">
+              <div className="p-2 text-xs text-muted-foreground">
                 Last edited by: {user?.fullName}
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
           <div
-            className="opacity-0 group-hover:opacity-100 h-full ml-auto rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
+            className="h-full ml-auto rounded-sm opacity-0 group-hover:opacity-100 hover:bg-neutral-300 dark:hover:bg-neutral-600"
             role="button"
             onClick={onCreate}
           >
-            <Plus className="h-4 w-4 text-muted-foreground" />
+            <Plus className="w-4 h-4 text-muted-foreground" />
           </div>
         </div>
       )}
@@ -183,7 +209,7 @@ Item.skeleton = function ItemSkeleton({ level }: { level?: number }) {
       }}
       className="flex gap-x-2 py-[3px]"
     >
-      <Skeleton className="h-4 w-4" />
+      <Skeleton className="w-4 h-4" />
       <Skeleton className="h-4 w-[30%]" />
     </div>
   );

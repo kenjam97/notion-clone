@@ -2,15 +2,15 @@
 
 import { cn } from "@/lib/utils";
 import {
+  Archive,
   ChevronsLeftIcon,
   MenuIcon,
   Plus,
   PlusCircle,
   Search,
   Settings,
-  Trash,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { useMutation } from "convex/react";
@@ -27,8 +27,10 @@ import {
 import { TrashBox } from "./trash-box";
 import { useSearch } from "@/hooks/use-search";
 import { useSettings } from "@/hooks/use-settings";
+import { Navbar } from "./navbar";
 
 export const Navigation = () => {
+  const params = useParams();
   const pathname = usePathname();
   const search = useSearch();
   const settings = useSettings();
@@ -133,9 +135,9 @@ export const Navigation = () => {
     const promise = createDocument({ title: "Untitled" });
 
     toast.promise(promise, {
-      loading: "Creating a new note...",
-      success: "Successfully created a new note",
-      error: "Failed to create a new note",
+      loading: "Creating a new document...",
+      success: "Successfully created a new document",
+      error: "Failed to create a new document",
     });
   };
 
@@ -157,7 +159,7 @@ export const Navigation = () => {
             isMobile && "opacity-100"
           )}
         >
-          <ChevronsLeftIcon className="h-6 w-6" />
+          <ChevronsLeftIcon className="w-6 h-6" />
         </div>
         <div>
           <UserItem />
@@ -165,16 +167,20 @@ export const Navigation = () => {
           <Item onClick={settings.onOpen} label="Settings" icon={Settings} />
           <Item
             onClick={handleCreateDocument}
-            label="New page"
+            label="New document"
             icon={PlusCircle}
           />
         </div>
         <div className="mt-4">
           <DocumentList />
-          <Item onClick={handleCreateDocument} label="Add a page" icon={Plus} />
+          <Item
+            onClick={handleCreateDocument}
+            label="New document"
+            icon={Plus}
+          />
           <Popover>
             <PopoverTrigger className="w-full mt-4">
-              <Item label="Trash" icon={Trash} />
+              <Item label="Archive" icon={Archive} />
             </PopoverTrigger>
             <PopoverContent
               side={isMobile ? "bottom" : "right"}
@@ -187,7 +193,7 @@ export const Navigation = () => {
         <div
           onMouseDown={handleNavbarMouseDown}
           onClick={resetSidebarWidth}
-          className="opacity-0 group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-1 bg-primary/10 right-0 top-0"
+          className="absolute top-0 right-0 w-1 h-full transition opacity-0 group-hover/sidebar:opacity-100 cursor-ew-resize bg-primary/10"
         />
       </aside>
       <div
@@ -198,15 +204,19 @@ export const Navigation = () => {
           isMobile && "left-0 w-full"
         )}
       >
-        <nav className="bg-transparent px-3 py-2 w-full">
-          {isCollapsed && (
-            <MenuIcon
-              role="button"
-              onClick={resetSidebarWidth}
-              className="h-6 w-6 text-muted-foreground"
-            />
-          )}
-        </nav>
+        {!!params.documentId ? (
+          <Navbar isCollapsed={isCollapsed} onResetWidth={resetSidebarWidth} />
+        ) : (
+          <nav className="w-full px-3 py-2 bg-transparent">
+            {isCollapsed && (
+              <MenuIcon
+                role="button"
+                onClick={resetSidebarWidth}
+                className="w-6 h-6 text-muted-foreground"
+              />
+            )}
+          </nav>
+        )}
       </div>
     </>
   );

@@ -60,14 +60,14 @@ export const SearchCommand = () => {
           {documents?.map((document) => (
             <CommandItem
               key={document._id}
-              value={`${document._id}-${document.title}`}
+              value={document._id}
               onClick={() => router.push(`/documents/${document._id}`)}
               onSelect={onSelect}
             >
               {document.icon ? (
                 <p className="mr-2 text-[18px]">{document.icon}</p>
               ) : (
-                <File className="mr-2 h-4 w-4" />
+                <File className="w-4 h-4 mr-2" />
               )}
               <span>{document.title}</span>
             </CommandItem>
