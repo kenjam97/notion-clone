@@ -114,12 +114,16 @@ export const getById = query({
       throw new Error("Not found");
     }
 
-    if (document.isPublished && !document.isArchived) {
-      return document;
-    }
-
     if (document.userId !== userId) {
       throw new Error("Unauthorized");
+    }
+
+    if (document.isArchived) {
+      throw new Error("Not found");
+    }
+
+    if (!document.isPublished) {
+      throw new Error("Not found");
     }
 
     return document;
